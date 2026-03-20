@@ -10,26 +10,16 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root {
-      --bg: #0e0f11;
-      --surface: #16181c;
-      --surface2: #1e2126;
-      --border: #2a2d35;
-      --border2: #3a3e49;
-      --text: #f0ede6;
-      --muted: #7a7f8e;
-      --accent: #c8f564;
-      --accent-dim: #a8d44a;
-      --accent-bg: rgba(200,245,100,0.08);
-      --red: #ff6b6b;
-      --red-bg: rgba(255,107,107,0.08);
-      --amber: #ffb347;
-      --green: #5dcc8a;
-      --green-bg: rgba(93,204,138,0.08);
+      --bg: #0e0f11; --surface: #16181c; --surface2: #1e2126;
+      --border: #2a2d35; --border2: #3a3e49; --text: #f0ede6;
+      --muted: #7a7f8e; --accent: #c8f564; --accent-dim: #a8d44a;
+      --accent-bg: rgba(200,245,100,0.08); --red: #ff6b6b;
+      --red-bg: rgba(255,107,107,0.08); --amber: #ffb347;
+      --green: #5dcc8a; --green-bg: rgba(93,204,138,0.08);
       --font-display: 'Fraunces', Georgia, serif;
       --font-body: 'DM Sans', sans-serif;
       --font-mono: 'DM Mono', monospace;
-      --radius: 10px;
-      --radius-lg: 16px;
+      --radius: 10px; --radius-lg: 16px;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 15px; line-height: 1.6; min-height: 100vh; }
@@ -45,11 +35,9 @@
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
     @media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } }
     .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; font-family: var(--font-mono); }
-    .field input, .field select { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-body); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color 0.2s; }
-    .field input:focus, .field select:focus { border-color: var(--accent); }
+    .field input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-body); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color 0.2s; }
+    .field input:focus { border-color: var(--accent); }
     .field input::placeholder { color: var(--muted); }
-    .field select option { background: var(--surface2); }
-    .field-hint { font-size: 11px; color: var(--muted); margin-top: 5px; font-family: var(--font-mono); }
     .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius); font-family: var(--font-body); font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.18s; }
     .btn-primary { background: var(--accent); color: #0e0f11; }
     .btn-primary:hover { background: var(--accent-dim); transform: translateY(-1px); }
@@ -59,18 +47,6 @@
     .btn-danger:hover { background: rgba(255,107,107,0.15); }
     .btn-export { background: var(--green-bg); border: 1px solid rgba(93,204,138,0.3); color: var(--green); }
     .btn-export:hover { background: rgba(93,204,138,0.2); }
-    .security-box { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 20px; }
-    .security-box-title { font-size: 11px; font-family: var(--font-mono); color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-    .verbal-code-display { display: flex; align-items: center; justify-content: space-between; background: var(--bg); border: 1px solid var(--border2); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 8px; }
-    .verbal-code-val { font-family: var(--font-mono); font-size: 32px; font-weight: 500; color: var(--accent); letter-spacing: 6px; }
-    .announce-banner { background: rgba(200,245,100,0.06); border: 1px solid rgba(200,245,100,0.2); border-radius: var(--radius); padding: 12px 16px; font-size: 13px; color: var(--accent); font-family: var(--font-mono); margin-top: 10px; }
-    .slot-bar-wrap { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; }
-    .slot-track { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin: 8px 0; }
-    .slot-fill { height: 4px; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
-    .slot-fill.near-full { background: var(--amber); }
-    .slot-fill.full { background: var(--red); }
-    .slot-count { font-family: var(--font-mono); font-size: 13px; color: var(--text); }
-    .slot-full-badge { display: inline-block; background: var(--red-bg); border: 1px solid rgba(255,107,107,0.3); color: var(--red); font-size: 11px; font-family: var(--font-mono); padding: 2px 10px; border-radius: 20px; }
     .qr-layout { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: start; }
     @media (max-width: 600px) { .qr-layout { grid-template-columns: 1fr; } }
     .qr-wrap { background: #fff; border-radius: var(--radius); padding: 16px; display: inline-block; }
@@ -114,9 +90,8 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
     .url-hint { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-top: 10px; word-break: break-all; }
     .new-badge { display: inline-block; background: var(--accent-bg); color: var(--accent); font-size: 10px; font-family: var(--font-mono); padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(200,245,100,0.2); margin-left: 8px; vertical-align: middle; animation: fadeIn 0.4s ease; }
-    .security-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 560px) { .security-grid { grid-template-columns: 1fr; } }
-    .mini-label { font-size: 11px; color: var(--muted); font-family: var(--font-mono); margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase; }
+    .sync-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-family: var(--font-mono); color: var(--green); }
+    .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 1.4s infinite; }
   </style>
 </head>
 <body>
@@ -128,8 +103,9 @@
 
 <main>
   <h1 class="page-title">Take attendance</h1>
-  <p class="page-sub">Generate a QR code, project it, and announce the verbal code out loud — only students physically in class can check in.</p>
+  <p class="page-sub">Generate a QR code, project it, and watch responses come in live from every student's device.</p>
 
+  <!-- SETUP -->
   <div id="setup-section">
     <div class="card">
       <div class="card-title">Session details</div>
@@ -146,14 +122,7 @@
           <label>Lecturer name</label>
           <input type="text" id="lecturer-name" placeholder="e.g. Dr. Adu Boateng" />
         </div>
-
       </div>
-
-      <div class="card-title" style="margin-top: 4px;">Security</div>
-      <div style="background: rgba(200,245,100,0.05); border: 1px solid rgba(200,245,100,0.15); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 20px; font-size: 13px; color: var(--muted); font-family: var(--font-mono);">
-        Each student can only use the link once. Once they submit, their device is locked — reopening the link shows "Already submitted".
-      </div>
-
       <button class="btn btn-primary" onclick="generateSession()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h7v7"/></svg>
         Generate QR code
@@ -161,6 +130,7 @@
     </div>
   </div>
 
+  <!-- ACTIVE SESSION -->
   <div id="session-section" class="hidden">
 
     <div class="card">
@@ -206,7 +176,7 @@
     <div class="card">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:8px;">
         <div class="card-title" style="margin:0;">Responses <span id="response-badge"></span></div>
-        <div style="font-size:12px; color:var(--muted); font-family:var(--font-mono);">Auto-refreshes every 3s</div>
+        <div class="sync-badge"><div class="sync-dot"></div> Live sync via Supabase</div>
       </div>
       <div class="stats-row">
         <div class="stat-box">
@@ -238,26 +208,47 @@
 </main>
 
 <script>
+  const SUPABASE_URL = 'https://omdkxclfaicigehnqkjn.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tZGt4Y2xmYWljaWdlaG5xa2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzA1OTgsImV4cCI6MjA4OTUwNjU5OH0._yUrFJ-LRQYz7mJesYX1LyZ1bJWM4D3cY2frnlnx-jg';
+
   const DURATION = 15 * 60;
   let sessionToken = null, expiresAt = null, timerInterval = null, pollInterval = null, lastCount = 0;
+  let currentData = [];
+  let currentSession = {};
 
   document.getElementById('session-date').value = new Date().toISOString().slice(0, 10);
+
+  async function sbFetch(path, options = {}) {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+      ...options,
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation',
+        ...(options.headers || {})
+      }
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+    const text = await res.text();
+    return text ? JSON.parse(text) : [];
+  }
 
   function generateSession() {
     const course = document.getElementById('course-name').value.trim();
     const date = document.getElementById('session-date').value;
     const lecturer = document.getElementById('lecturer-name').value.trim();
-    // Auto-detect checkin.html URL — same folder as this page
-    const baseUrl = window.location.href.replace(/\/[^\/]*$/, '') + '/checkin.html';
 
     if (!course) { alert('Please enter a course name.'); return; }
 
     sessionToken = 'att_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
     expiresAt = Date.now() + DURATION * 1000;
+    currentSession = { course, date, lecturer };
 
-    localStorage.setItem('att_session_' + sessionToken, JSON.stringify({ course, date, lecturer, token: sessionToken, expiresAt }));
-    localStorage.setItem('att_responses_' + sessionToken, JSON.stringify([]));
-
+    const baseUrl = window.location.href.replace(/\/[^\/]*$/, '') + '/checkin.html';
     const params = new URLSearchParams({ token: sessionToken, course, date, lecturer, exp: expiresAt });
     const qrUrl = baseUrl + '?' + params.toString();
 
@@ -265,10 +256,13 @@
     document.getElementById('disp-meta').textContent = [lecturer, date].filter(Boolean).join('  ·  ');
     document.getElementById('qr-url-display').textContent = qrUrl;
 
-    QRCode.toCanvas(document.getElementById('qr-canvas'), qrUrl, { width: 220, margin: 2, color: { dark: '#000000', light: '#ffffff' } });
+    QRCode.toCanvas(document.getElementById('qr-canvas'), qrUrl, {
+      width: 220, margin: 2, color: { dark: '#000000', light: '#ffffff' }
+    });
 
     document.getElementById('setup-section').classList.add('hidden');
     document.getElementById('session-section').classList.remove('hidden');
+
     startTimer();
     startPolling();
   }
@@ -291,47 +285,65 @@
         document.getElementById('status-text').textContent = 'QR code expired — check-in closed';
         document.getElementById('btn-pdf').classList.remove('hidden');
         document.getElementById('btn-csv').classList.remove('hidden');
-        renderResponses();
+        fetchAndRender();
       }
     }, 1000);
   }
 
   function startPolling() {
     clearInterval(pollInterval);
-    pollInterval = setInterval(renderResponses, 3000);
-    renderResponses();
+    fetchAndRender();
+    pollInterval = setInterval(fetchAndRender, 4000);
   }
 
-  function getResponses() {
-    try { return JSON.parse(localStorage.getItem('att_responses_' + sessionToken) || '[]'); } catch { return []; }
+  async function fetchAndRender() {
+    try {
+      const data = await sbFetch('attendance?session_token=eq.' + encodeURIComponent(sessionToken) + '&order=submitted_at.asc&select=student_name,student_ref,submitted_at');
+      currentData = data;
+      renderTable(data);
+    } catch(e) {
+      console.error('Fetch error:', e);
+    }
   }
 
-  function renderResponses() {
-    const data = getResponses();
+  function renderTable(data) {
     const total = data.length;
     document.getElementById('stat-total').textContent = total;
 
-    if (total !== lastCount && total > 0) {
+    if (total > lastCount && total > 0) {
       const last = data[data.length - 1];
-      document.getElementById('stat-last').textContent = last.name.split(' ')[0];
-      document.getElementById('stat-time').textContent = last.time;
-      if (total > lastCount) {
-        document.getElementById('response-badge').innerHTML = '<span class="new-badge">+' + (total - lastCount) + ' new</span>';
-        setTimeout(() => { document.getElementById('response-badge').innerHTML = ''; }, 3000);
-      }
+      document.getElementById('stat-last').textContent = last.student_name.split(' ')[0];
+      const t = new Date(last.submitted_at);
+      document.getElementById('stat-time').textContent = t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('response-badge').innerHTML = '<span class="new-badge">+' + (total - lastCount) + ' new</span>';
+      setTimeout(() => { document.getElementById('response-badge').innerHTML = ''; }, 3000);
       lastCount = total;
     }
 
     const tbody = document.getElementById('responses-body');
-    if (!total) { tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">⏳</div><div>Waiting for students to scan...</div></div></td></tr>'; return; }
-    tbody.innerHTML = data.map((r, i) => `<tr><td class="td-num">${i+1}</td><td class="td-name">${esc(r.name)}</td><td class="td-ref">${esc(r.ref)}</td><td class="td-time">${esc(r.time)}</td></tr>`).join('');
+    if (!total) {
+      tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">⏳</div><div>Waiting for students to scan...</div></div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.map((r, i) => {
+      const t = new Date(r.submitted_at);
+      const time = t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return `<tr>
+        <td class="td-num">${i+1}</td>
+        <td class="td-name">${esc(r.student_name)}</td>
+        <td class="td-ref">${esc(r.student_ref)}</td>
+        <td class="td-time">${time}</td>
+      </tr>`;
+    }).join('');
   }
 
   function exportCSV() {
-    const data = getResponses();
-    const s = JSON.parse(localStorage.getItem('att_session_' + sessionToken) || '{}');
+    const s = currentSession;
     let csv = 'No.,Full Name,Reference Number,Time\n';
-    data.forEach((r, i) => { csv += `${i+1},"${r.name}","${r.ref}","${r.time}"\n`; });
+    currentData.forEach((r, i) => {
+      const t = new Date(r.submitted_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      csv += `${i+1},"${r.student_name}","${r.student_ref}","${t}"\n`;
+    });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
     a.download = (s.course || 'attendance').replace(/\s+/g,'_') + '_' + (s.date||'') + '.csv';
@@ -341,25 +353,26 @@
   function exportPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    const data = getResponses();
-    const s = JSON.parse(localStorage.getItem('att_session_' + sessionToken) || '{}');
+    const s = currentSession;
     doc.setFont('helvetica','bold'); doc.setFontSize(20); doc.text('Attendance Record', 14, 22);
     doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(100);
     if (s.course) doc.text('Course: ' + s.course, 14, 34);
     if (s.date) doc.text('Date: ' + s.date, 14, 41);
     if (s.lecturer) doc.text('Lecturer: ' + s.lecturer, 14, 48);
-    doc.text('Total responses: ' + data.length, 14, 55);
+    doc.text('Total responses: ' + currentData.length, 14, 55);
     doc.setTextColor(0);
     let y = 68;
     doc.setFillColor(240,240,240); doc.rect(14, y-5, 182, 8, 'F');
     doc.setFont('helvetica','bold'); doc.setFontSize(9);
     doc.text('#',16,y); doc.text('Full Name',26,y); doc.text('Reference No.',120,y); doc.text('Time',172,y);
     doc.setFont('helvetica','normal'); y += 8;
-    data.forEach((r, i) => {
+    currentData.forEach((r, i) => {
       if (y > 275) { doc.addPage(); y = 20; }
       if (i%2===0) { doc.setFillColor(252,252,252); doc.rect(14,y-4,182,7,'F'); }
+      const t = new Date(r.submitted_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       doc.setFontSize(10);
-      doc.text(String(i+1),16,y); doc.text(r.name.substring(0,42),26,y); doc.text(r.ref,120,y); doc.text(r.time,172,y);
+      doc.text(String(i+1),16,y); doc.text(r.student_name.substring(0,42),26,y);
+      doc.text(r.student_ref,120,y); doc.text(t,172,y);
       y += 8;
     });
     doc.save((s.course||'attendance').replace(/\s+/g,'_') + '_' + (s.date||'') + '.pdf');
@@ -367,7 +380,7 @@
 
   function newSession() {
     clearInterval(timerInterval); clearInterval(pollInterval);
-    sessionToken = null; expiresAt = null; lastCount = 0;
+    sessionToken = null; expiresAt = null; lastCount = 0; currentData = [];
     document.getElementById('session-section').classList.add('hidden');
     document.getElementById('setup-section').classList.remove('hidden');
     document.getElementById('btn-pdf').classList.add('hidden');
