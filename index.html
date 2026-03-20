@@ -140,7 +140,7 @@
           <div class="qr-wrap">
             <canvas id="qr-canvas"></canvas>
           </div>
-          <div class="url-hint" id="qr-url-display"></div>
+
         </div>
         <div>
           <div class="session-name" id="disp-course"></div>
@@ -254,7 +254,7 @@
 
     document.getElementById('disp-course').textContent = course;
     document.getElementById('disp-meta').textContent = [lecturer, date].filter(Boolean).join('  ·  ');
-    document.getElementById('qr-url-display').textContent = qrUrl;
+
 
     QRCode.toCanvas(document.getElementById('qr-canvas'), qrUrl, {
       width: 220, margin: 2, color: { dark: '#000000', light: '#ffffff' }
