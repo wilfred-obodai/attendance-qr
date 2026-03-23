@@ -1,210 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AttendQR — Lecturer Dashboard</title>
+  <title>AttendQR — Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,300;9..144,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    :root {
-      --bg: #0e0f11; --surface: #16181c; --surface2: #1e2126;
-      --border: #2a2d35; --border2: #3a3e49; --text: #f0ede6;
-      --muted: #7a7f8e; --accent: #c8f564; --accent-dim: #a8d44a;
-      --accent-bg: rgba(200,245,100,0.08); --red: #ff6b6b;
-      --red-bg: rgba(255,107,107,0.08); --amber: #ffb347;
-      --green: #5dcc8a; --green-bg: rgba(93,204,138,0.08);
-      --font-display: 'Fraunces', Georgia, serif;
-      --font-body: 'DM Sans', sans-serif;
-      --font-mono: 'DM Mono', monospace;
-      --radius: 10px; --radius-lg: 16px;
+    :root{
+      --bg:#0e0f11;--surface:#16181c;--surface2:#1e2126;
+      --border:#2a2d35;--border2:#3a3e49;--text:#f0ede6;
+      --muted:#7a7f8e;--accent:#c8f564;--accent-dim:#a8d44a;
+      --accent-bg:rgba(200,245,100,0.08);--red:#ff6b6b;
+      --red-bg:rgba(255,107,107,0.08);--amber:#ffb347;
+      --green:#5dcc8a;--green-bg:rgba(93,204,138,0.08);
+      --font-display:'Fraunces',Georgia,serif;
+      --font-body:'DM Sans',sans-serif;
+      --font-mono:'DM Mono',monospace;
+      --radius:10px;--radius-lg:16px;
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 15px; line-height: 1.6; min-height: 100vh; }
-    header { border-bottom: 1px solid var(--border); padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; }
-    .logo { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--accent); letter-spacing: -0.5px; }
-    .logo span { color: var(--muted); font-weight: 300; }
-    .header-tag { font-size: 11px; font-family: var(--font-mono); color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
-    main { max-width: 860px; margin: 0 auto; padding: 40px 24px; }
-    .page-title { font-family: var(--font-display); font-size: 32px; font-weight: 300; margin-bottom: 6px; }
-    .page-sub { color: var(--muted); font-size: 14px; margin-bottom: 36px; }
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; margin-bottom: 20px; }
-    .card-title { font-size: 11px; font-family: var(--font-mono); color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 20px; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-    @media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } }
-    .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; font-family: var(--font-mono); }
-    .field input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-body); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color 0.2s; }
-    .field input:focus { border-color: var(--accent); }
-    .field input::placeholder { color: var(--muted); }
-    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: var(--radius); font-family: var(--font-body); font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.18s; }
-    .btn-primary { background: var(--accent); color: #0e0f11; }
-    .btn-primary:hover { background: var(--accent-dim); transform: translateY(-1px); }
-    .btn-outline { background: transparent; border: 1px solid var(--border2); color: var(--text); }
-    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-    .btn-danger { background: var(--red-bg); border: 1px solid rgba(255,107,107,0.3); color: var(--red); }
-    .btn-danger:hover { background: rgba(255,107,107,0.15); }
-    .btn-export { background: var(--green-bg); border: 1px solid rgba(93,204,138,0.3); color: var(--green); }
-    .btn-export:hover { background: rgba(93,204,138,0.2); }
-    .qr-layout { display: grid; grid-template-columns: auto 1fr; gap: 32px; align-items: start; }
-    @media (max-width: 600px) { .qr-layout { grid-template-columns: 1fr; } }
-    .qr-wrap { background: #fff; border-radius: var(--radius); padding: 16px; display: inline-block; }
-    #qr-canvas { display: block; }
-    .session-name { font-family: var(--font-display); font-size: 24px; font-weight: 600; margin-bottom: 4px; }
-    .session-date { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin-bottom: 24px; }
-    .timer-block { margin-bottom: 20px; }
-    .timer-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
-    .timer-display { font-family: var(--font-mono); font-size: 40px; font-weight: 500; color: var(--accent); line-height: 1; transition: color 0.5s; }
-    .timer-display.warning { color: var(--amber); }
-    .timer-display.danger { color: var(--red); }
-    .timer-label { font-size: 12px; color: var(--muted); }
-    .progress-track { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
-    .progress-fill { height: 4px; border-radius: 2px; background: var(--accent); transition: width 1s linear, background 0.5s; }
-    .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-family: var(--font-mono); margin-top: 12px; }
-    .status-pill.active { background: var(--green-bg); border: 1px solid rgba(93,204,138,0.3); color: var(--green); }
-    .status-pill.expired { background: var(--red-bg); border: 1px solid rgba(255,107,107,0.3); color: var(--red); }
-    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 1.4s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-    .expired .dot { animation: none; }
-    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-    .stat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; text-align: center; }
-    .stat-num { font-family: var(--font-mono); font-size: 28px; font-weight: 500; color: var(--accent); }
-    .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .table-wrap { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    thead th { background: var(--surface2); padding: 10px 16px; text-align: left; font-size: 11px; font-family: var(--font-mono); color: var(--muted); letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid var(--border); }
-    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: var(--surface2); }
-    tbody td { padding: 12px 16px; }
-    .td-num { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
-    .td-name { font-weight: 500; }
-    .td-ref { font-family: var(--font-mono); font-size: 13px; color: var(--accent); }
-    .td-time { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
-    .empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
-    .empty-icon { width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-    .action-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
-    .hidden { display: none !important; }
-    #setup-section, #session-section { animation: fadeIn 0.3s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-    .url-hint { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-top: 10px; word-break: break-all; }
-    .new-badge { display: inline-block; background: var(--accent-bg); color: var(--accent); font-size: 10px; font-family: var(--font-mono); padding: 2px 8px; border-radius: 20px; border: 1px solid rgba(200,245,100,0.2); margin-left: 8px; vertical-align: middle; animation: fadeIn 0.4s ease; }
-    .sync-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-family: var(--font-mono); color: var(--green); }
-    .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 1.4s infinite; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.6;min-height:100vh;}
+    header{border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .logo{font-family:var(--font-display);font-size:20px;font-weight:600;color:var(--accent);letter-spacing:-0.5px;}
+    .logo span{color:var(--muted);font-weight:300;}
+    .header-right{display:flex;align-items:center;gap:16px;}
+    .user-name{font-size:13px;color:var(--muted);font-family:var(--font-mono);}
+    .btn-sm{padding:7px 14px;border-radius:var(--radius);font-family:var(--font-body);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.18s;}
+    .btn-accent{background:var(--accent);color:#0e0f11;}
+    .btn-accent:hover{background:var(--accent-dim);}
+    .btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--muted);}
+    .btn-ghost:hover{color:var(--text);border-color:var(--text);}
+    .btn-danger-sm{background:var(--red-bg);border:1px solid rgba(255,107,107,0.3);color:var(--red);}
+    .btn-danger-sm:hover{background:rgba(255,107,107,0.15);}
+    .btn-export-sm{background:var(--green-bg);border:1px solid rgba(93,204,138,0.3);color:var(--green);}
+    .btn-export-sm:hover{background:rgba(93,204,138,0.2);}
+    main{max-width:960px;margin:0 auto;padding:36px 24px;}
+
+    /* VIEWS */
+    .view{display:none;}
+    .view.active{display:block;animation:fadeIn 0.3s ease;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+    /* CARDS */
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:20px;}
+    .card-title{font-size:11px;font-family:var(--font-mono);color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:18px;}
+
+    /* FORM */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+    @media(max-width:560px){.form-grid{grid-template-columns:1fr;}}
+    .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-family:var(--font-mono);}
+    .field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--font-body);font-size:14px;padding:10px 14px;outline:none;transition:border-color 0.2s;}
+    .field input:focus{border-color:var(--accent);}
+    .field input::placeholder{color:var(--muted);}
+
+    /* QR */
+    .qr-layout{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:start;}
+    @media(max-width:600px){.qr-layout{grid-template-columns:1fr;}}
+    .qr-wrap{background:#fff;border-radius:var(--radius);padding:14px;display:inline-block;}
+    .session-name{font-family:var(--font-display);font-size:22px;font-weight:600;margin-bottom:4px;}
+    .session-date{font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-bottom:20px;}
+    .timer-row{display:flex;align-items:baseline;gap:10px;margin-bottom:8px;}
+    .timer-display{font-family:var(--font-mono);font-size:38px;font-weight:500;color:var(--accent);line-height:1;transition:color 0.5s;}
+    .timer-display.warning{color:var(--amber);}
+    .timer-display.danger{color:var(--red);}
+    .timer-label{font-size:12px;color:var(--muted);}
+    .progress-track{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;margin-bottom:12px;}
+    .progress-fill{height:4px;border-radius:2px;background:var(--accent);transition:width 1s linear,background 0.5s;}
+    .status-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:12px;font-family:var(--font-mono);}
+    .status-pill.active{background:var(--green-bg);border:1px solid rgba(93,204,138,0.3);color:var(--green);}
+    .status-pill.expired{background:var(--red-bg);border:1px solid rgba(255,107,107,0.3);color:var(--red);}
+    .dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 1.4s infinite;}
+    @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+    .expired .dot{animation:none;}
+    .action-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+
+    /* STATS */
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;}
+    .stat-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;}
+    .stat-num{font-family:var(--font-mono);font-size:26px;font-weight:500;color:var(--accent);}
+    .stat-lbl{font-size:11px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;}
+
+    /* TABLE */
+    .table-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+    table{width:100%;border-collapse:collapse;font-size:14px;}
+    thead th{background:var(--surface2);padding:9px 14px;text-align:left;font-size:11px;font-family:var(--font-mono);color:var(--muted);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border);}
+    tbody tr{border-bottom:1px solid var(--border);transition:background 0.15s;}
+    tbody tr:last-child{border-bottom:none;}
+    tbody tr:hover{background:var(--surface2);}
+    tbody td{padding:11px 14px;}
+    .td-num{font-family:var(--font-mono);font-size:12px;color:var(--muted);}
+    .td-name{font-weight:500;}
+    .td-ref{font-family:var(--font-mono);font-size:13px;color:var(--accent);}
+    .td-time{font-family:var(--font-mono);font-size:12px;color:var(--muted);}
+    .empty-state{text-align:center;padding:40px 24px;color:var(--muted);}
+
+    /* CLASS GROUPS */
+    .class-group{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:16px;overflow:hidden;}
+    .class-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;cursor:pointer;transition:background 0.15s;gap:12px;}
+    .class-header:hover{background:var(--surface2);}
+    .class-header-left{display:flex;align-items:center;gap:14px;}
+    .class-icon{width:40px;height:40px;border-radius:10px;background:var(--accent-bg);border:1px solid rgba(200,245,100,0.2);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:13px;font-weight:500;color:var(--accent);}
+    .class-name{font-family:var(--font-display);font-size:18px;font-weight:600;}
+    .class-meta{font-size:12px;color:var(--muted);font-family:var(--font-mono);margin-top:2px;}
+    .class-header-right{display:flex;align-items:center;gap:10px;}
+    .chevron{font-size:12px;color:var(--muted);transition:transform 0.2s;}
+    .chevron.open{transform:rotate(180deg);}
+    .class-sessions{display:none;border-top:1px solid var(--border);}
+    .class-sessions.open{display:block;}
+    .session-row{display:flex;align-items:center;justify-content:space-between;padding:13px 22px;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap;}
+    .session-row:last-child{border-bottom:none;}
+    .session-info{flex:1;}
+    .session-date-text{font-family:var(--font-mono);font-size:12px;color:var(--muted);}
+    .session-count{font-size:13px;font-weight:500;margin-top:2px;}
+    .session-actions{display:flex;gap:6px;flex-wrap:wrap;}
+
+    /* OVERVIEW STATS */
+    .overview-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
+    .overview-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;text-align:center;}
+    .overview-stat-num{font-family:var(--font-mono);font-size:32px;font-weight:500;color:var(--accent);}
+    .overview-stat-lbl{font-size:12px;color:var(--muted);margin-top:4px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.5px;}
+
+    /* MISC */
+    .hidden{display:none!important;}
+    .new-badge{display:inline-block;background:var(--accent-bg);color:var(--accent);font-size:10px;font-family:var(--font-mono);padding:2px 8px;border-radius:20px;border:1px solid rgba(200,245,100,0.2);margin-left:8px;vertical-align:middle;}
+    .sync-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-family:var(--font-mono);color:var(--green);}
+    .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.4s infinite;}
+    .section-title{font-family:var(--font-display);font-size:22px;font-weight:300;margin-bottom:6px;}
+    .section-sub{color:var(--muted);font-size:13px;margin-bottom:24px;}
+    .back-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:20px;font-family:var(--font-mono);}
+    .back-btn:hover{color:var(--text);}
+    .spinner{display:inline-block;width:14px;height:14px;border:2px solid #0e0f11;border-top-color:transparent;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
   </style>
 </head>
 <body>
 
 <header>
   <div class="logo">Attend<span>QR</span></div>
-  <div class="header-tag">Lecturer Dashboard</div>
+  <div class="header-right">
+    <div class="user-name" id="header-username"></div>
+    <button class="btn-sm btn-accent" onclick="showView('new-session')">+ New session</button>
+    <button class="btn-sm btn-ghost" onclick="logout()">Sign out</button>
+  </div>
 </header>
 
 <main>
-  <h1 class="page-title">Take attendance</h1>
-  <p class="page-sub">Generate a QR code, project it, and watch responses come in live from every student's device.</p>
 
-  <!-- SETUP -->
-  <div id="setup-section">
+  <!-- DASHBOARD VIEW -->
+  <div id="view-dashboard" class="view active">
+    <div class="section-title">My classes</div>
+    <div class="section-sub">All your attendance sessions grouped by class.</div>
+
+    <div class="overview-stats">
+      <div class="overview-stat"><div class="overview-stat-num" id="ov-classes">0</div><div class="overview-stat-lbl">Classes</div></div>
+      <div class="overview-stat"><div class="overview-stat-num" id="ov-sessions">0</div><div class="overview-stat-lbl">Sessions</div></div>
+      <div class="overview-stat"><div class="overview-stat-num" id="ov-students">0</div><div class="overview-stat-lbl">Total students</div></div>
+    </div>
+
+    <div id="classes-list">
+      <div class="empty-state">Loading your classes...</div>
+    </div>
+  </div>
+
+  <!-- NEW SESSION VIEW -->
+  <div id="view-new-session" class="view">
+    <div class="back-btn" onclick="showView('dashboard')">← Back to dashboard</div>
+    <div class="section-title">New session</div>
+    <div class="section-sub">Fill in the details and generate your QR code.</div>
+
     <div class="card">
       <div class="card-title">Session details</div>
       <div class="form-grid">
         <div class="field">
-          <label>Course name</label>
-          <input type="text" id="course-name" placeholder="e.g. MATH 201 — Lecture 5" />
+          <label>Class name</label>
+          <input type="text" id="course-name" placeholder="e.g. ECONS 151" />
         </div>
         <div class="field">
           <label>Date</label>
-          <input type="date" id="session-date" />
-        </div>
-        <div class="field">
-          <label>Lecturer name</label>
-          <input type="text" id="lecturer-name" placeholder="e.g. Dr. Adu Boateng" />
+          <input type="date" id="session-date"/>
         </div>
       </div>
-      <button class="btn btn-primary" onclick="generateSession()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h7v7"/></svg>
+      <button class="btn-sm btn-accent" style="padding:10px 20px; font-size:14px;" onclick="generateSession()">
         Generate QR code
       </button>
     </div>
   </div>
 
-  <!-- ACTIVE SESSION -->
-  <div id="session-section" class="hidden">
+  <!-- ACTIVE SESSION VIEW -->
+  <div id="view-active" class="view">
+    <div class="back-btn" onclick="endSession()">← End session & go back</div>
 
     <div class="card">
       <div class="card-title">QR code — project this screen</div>
       <div class="qr-layout">
         <div>
-          <div class="qr-wrap">
-            <canvas id="qr-canvas"></canvas>
-          </div>
-
+          <div class="qr-wrap"><canvas id="qr-canvas"></canvas></div>
         </div>
         <div>
           <div class="session-name" id="disp-course"></div>
           <div class="session-date" id="disp-meta"></div>
-          <div class="timer-block">
-            <div class="timer-row">
-              <div class="timer-display" id="timer">15:00</div>
-              <div class="timer-label">remaining</div>
-            </div>
-            <div class="progress-track">
-              <div class="progress-fill" id="progress-fill" style="width:100%"></div>
-            </div>
-            <div class="status-pill active" id="status-pill">
-              <div class="dot"></div>
-              <span id="status-text">QR active — scan to check in</span>
-            </div>
+          <div class="timer-row">
+            <div class="timer-display" id="timer">15:00</div>
+            <div class="timer-label">remaining</div>
           </div>
+          <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:100%"></div></div>
+          <div class="status-pill active" id="status-pill"><div class="dot"></div><span id="status-text">QR active — scan to check in</span></div>
           <div class="action-row">
-            <button class="btn btn-export hidden" id="btn-pdf" onclick="exportPDF()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              Download PDF
-            </button>
-            <button class="btn btn-outline hidden" id="btn-csv" onclick="exportCSV()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export CSV
-            </button>
-            <button class="btn btn-danger" onclick="newSession()">New session</button>
+            <button class="btn-sm btn-export-sm hidden" id="btn-pdf" onclick="exportPDF()">Download PDF</button>
+            <button class="btn-sm btn-ghost hidden" id="btn-csv" onclick="exportCSV()">Export CSV</button>
           </div>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:8px;">
-        <div class="card-title" style="margin:0;">Responses <span id="response-badge"></span></div>
-        <div class="sync-badge"><div class="sync-dot"></div> Live sync via Supabase</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px;">
+        <div class="card-title" style="margin:0;">Live responses <span id="response-badge"></span></div>
+        <div class="sync-badge"><div class="sync-dot"></div> Live sync</div>
       </div>
       <div class="stats-row">
-        <div class="stat-box">
-          <div class="stat-num" id="stat-total">0</div>
-          <div class="stat-lbl">Checked in</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-num" id="stat-last" style="font-size:16px;">—</div>
-          <div class="stat-lbl">Last entry</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-num" id="stat-time" style="font-size:16px; color:var(--muted);">—</div>
-          <div class="stat-lbl">At time</div>
-        </div>
+        <div class="stat-box"><div class="stat-num" id="stat-total">0</div><div class="stat-lbl">Checked in</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-last" style="font-size:15px;">—</div><div class="stat-lbl">Last entry</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-time" style="font-size:15px;color:var(--muted);">—</div><div class="stat-lbl">At time</div></div>
       </div>
       <div class="table-wrap">
         <table>
-          <thead>
-            <tr><th>#</th><th>Full name</th><th>Reference no.</th><th>Time</th></tr>
-          </thead>
+          <thead><tr><th>#</th><th>Full name</th><th>Reference no.</th><th>Time</th></tr></thead>
           <tbody id="responses-body">
-            <tr><td colspan="4"><div class="empty-state"><div class="empty-icon">⏳</div><div>Waiting for students to scan...</div></div></td></tr>
+            <tr><td colspan="4"><div class="empty-state">Waiting for students to scan...</div></td></tr>
           </tbody>
         </table>
       </div>
     </div>
-
   </div>
+
+  <!-- SESSION DETAIL VIEW -->
+  <div id="view-session-detail" class="view">
+    <div class="back-btn" onclick="showView('dashboard')">← Back to dashboard</div>
+    <div id="detail-header" style="margin-bottom:20px;">
+      <div class="section-title" id="detail-course"></div>
+      <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);" id="detail-meta"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+      <button class="btn-sm btn-export-sm" onclick="exportDetailPDF()">Download PDF</button>
+      <button class="btn-sm btn-ghost" onclick="exportDetailCSV()">Export CSV</button>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table>
+        <thead><tr><th>#</th><th>Full name</th><th>Reference no.</th><th>Time</th></tr></thead>
+        <tbody id="detail-body"></tbody>
+      </table>
+    </div>
+  </div>
+
 </main>
 
 <script>
@@ -212,57 +263,165 @@
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tZGt4Y2xmYWljaWdlaG5xa2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzA1OTgsImV4cCI6MjA4OTUwNjU5OH0._yUrFJ-LRQYz7mJesYX1LyZ1bJWM4D3cY2frnlnx-jg';
 
   const DURATION = 15 * 60;
-  let sessionToken = null, expiresAt = null, timerInterval = null, pollInterval = null, lastCount = 0;
-  let currentData = [];
-  let currentSession = {};
+  let currentUser = null, accessToken = null;
+  let sessionToken = null, expiresAt = null;
+  let timerInterval = null, pollInterval = null;
+  let lastCount = 0, currentData = [], currentSession = {};
+  let detailData = [], detailSession = {};
 
-  document.getElementById('session-date').value = new Date().toISOString().slice(0, 10);
+  // AUTH CHECK
+  const stored = localStorage.getItem('aq_session');
+  if (!stored) { window.location.href = 'login.html'; }
+  else {
+    try {
+      const s = JSON.parse(stored);
+      accessToken = s.access_token;
+      currentUser = s.user;
+      const name = currentUser?.user_metadata?.full_name || currentUser?.email || '';
+      document.getElementById('header-username').textContent = name;
+    } catch(e) { window.location.href = 'login.html'; }
+  }
 
-  async function sbFetch(path, options = {}) {
+  document.getElementById('session-date').value = new Date().toISOString().slice(0,10);
+
+  async function sbFetch(path, options={}) {
     const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
       ...options,
       headers: {
         'apikey': SUPABASE_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Authorization': 'Bearer ' + accessToken,
         'Content-Type': 'application/json',
         'Prefer': 'return=representation',
-        ...(options.headers || {})
+        ...(options.headers||{})
       }
     });
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err);
-    }
     const text = await res.text();
     return text ? JSON.parse(text) : [];
   }
 
-  function generateSession() {
+  function showView(name) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    if (name === 'dashboard') loadDashboard();
+  }
+
+  function logout() {
+    localStorage.removeItem('aq_session');
+    window.location.href = 'login.html';
+  }
+
+  // ── DASHBOARD ─────────────────────────────────────────
+  async function loadDashboard() {
+    document.getElementById('classes-list').innerHTML = '<div class="empty-state">Loading...</div>';
+    try {
+      const sessions = await sbFetch('sessions?lecturer_id=eq.' + currentUser.id + '&order=created_at.desc&select=*');
+      const attendance = await sbFetch('attendance?session_token=in.(' + (sessions.map(s=>`"${s.session_token}"`).join(',') || '""') + ')&select=session_token');
+
+      // Count per session
+      const countMap = {};
+      attendance.forEach(a => { countMap[a.session_token] = (countMap[a.session_token]||0) + 1; });
+
+      // Group by course
+      const groups = {};
+      sessions.forEach(s => {
+        if (!groups[s.course]) groups[s.course] = [];
+        groups[s.course].push({ ...s, studentCount: countMap[s.session_token] || 0 });
+      });
+
+      const totalClasses  = Object.keys(groups).length;
+      const totalSessions = sessions.length;
+      const totalStudents = attendance.length;
+
+      document.getElementById('ov-classes').textContent  = totalClasses;
+      document.getElementById('ov-sessions').textContent = totalSessions;
+      document.getElementById('ov-students').textContent = totalStudents;
+
+      if (!sessions.length) {
+        document.getElementById('classes-list').innerHTML = '<div class="empty-state">No sessions yet. Click "+ New session" to get started.</div>';
+        return;
+      }
+
+      document.getElementById('classes-list').innerHTML = Object.entries(groups).map(([course, slist]) => {
+        const totalForClass = slist.reduce((a,b) => a + b.studentCount, 0);
+        const initials = course.split(' ').map(w=>w[0]).join('').substring(0,3).toUpperCase();
+        return `
+          <div class="class-group">
+            <div class="class-header" onclick="toggleClass('${esc(course)}')">
+              <div class="class-header-left">
+                <div class="class-icon">${initials}</div>
+                <div>
+                  <div class="class-name">${esc(course)}</div>
+                  <div class="class-meta">${slist.length} session${slist.length!==1?'s':''} &nbsp;·&nbsp; ${totalForClass} students total</div>
+                </div>
+              </div>
+              <div class="class-header-right">
+                <div class="chevron" id="chev-${esc(course)}">▼</div>
+              </div>
+            </div>
+            <div class="class-sessions" id="cls-${esc(course)}">
+              ${slist.map(s => `
+                <div class="session-row">
+                  <div class="session-info">
+                    <div class="session-date-text">${s.date || 'No date'}</div>
+                    <div class="session-count">${s.studentCount} student${s.studentCount!==1?'s':''} checked in</div>
+                  </div>
+                  <div class="session-actions">
+                    <button class="btn-sm btn-ghost" onclick="openDetail('${s.session_token}','${esc(course)}','${s.date||''}','${s.lecturer_name||''}')">View</button>
+                    <button class="btn-sm btn-export-sm" onclick="quickPDF('${s.session_token}','${esc(course)}','${s.date||''}','${s.lecturer_name||''}')">PDF</button>
+                    <button class="btn-sm btn-ghost" onclick="quickCSV('${s.session_token}','${esc(course)}','${s.date||''}','${s.lecturer_name||''}')">CSV</button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>`;
+      }).join('');
+    } catch(e) {
+      document.getElementById('classes-list').innerHTML = '<div class="empty-state">Failed to load. Please refresh.</div>';
+    }
+  }
+
+  function toggleClass(course) {
+    const panel = document.getElementById('cls-' + course);
+    const chev  = document.getElementById('chev-' + course);
+    const open  = panel.classList.toggle('open');
+    chev.classList.toggle('open', open);
+  }
+
+  // ── GENERATE SESSION ──────────────────────────────────
+  async function generateSession() {
     const course = document.getElementById('course-name').value.trim();
-    const date = document.getElementById('session-date').value;
-    const lecturer = document.getElementById('lecturer-name').value.trim();
+    const date   = document.getElementById('session-date').value;
+    if (!course) { alert('Please enter a class name.'); return; }
 
-    if (!course) { alert('Please enter a course name.'); return; }
+    sessionToken   = 'att_' + Date.now() + '_' + Math.random().toString(36).substr(2,8);
+    expiresAt      = Date.now() + DURATION * 1000;
+    currentSession = { course, date, lecturer: currentUser?.user_metadata?.full_name || '' };
+    lastCount = 0; currentData = [];
 
-    sessionToken = 'att_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
-    expiresAt = Date.now() + DURATION * 1000;
-    currentSession = { course, date, lecturer };
+    // Save session to Supabase
+    try {
+      await sbFetch('sessions', {
+        method: 'POST',
+        body: JSON.stringify({
+          lecturer_id: currentUser.id,
+          session_token: sessionToken,
+          course,
+          date,
+          lecturer_name: currentSession.lecturer
+        })
+      });
+    } catch(e) { console.error('Session save error:', e); }
 
     const baseUrl = window.location.href.replace(/\/[^\/]*$/, '') + '/checkin.html';
-    const params = new URLSearchParams({ token: sessionToken, course, date, lecturer, exp: expiresAt });
-    const qrUrl = baseUrl + '?' + params.toString();
+    const params  = new URLSearchParams({ token: sessionToken, course, date, lecturer: currentSession.lecturer, exp: expiresAt });
+    const qrUrl   = baseUrl + '?' + params.toString();
 
     document.getElementById('disp-course').textContent = course;
-    document.getElementById('disp-meta').textContent = [lecturer, date].filter(Boolean).join('  ·  ');
+    document.getElementById('disp-meta').textContent   = [currentSession.lecturer, date].filter(Boolean).join('  ·  ');
 
+    QRCode.toCanvas(document.getElementById('qr-canvas'), qrUrl, { width: 200, margin: 2, color: { dark: '#000000', light: '#ffffff' } });
 
-    QRCode.toCanvas(document.getElementById('qr-canvas'), qrUrl, {
-      width: 220, margin: 2, color: { dark: '#000000', light: '#ffffff' }
-    });
-
-    document.getElementById('setup-section').classList.add('hidden');
-    document.getElementById('session-section').classList.remove('hidden');
-
+    showView('active');
     startTimer();
     startPolling();
   }
@@ -271,15 +430,15 @@
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
       const remaining = Math.max(0, Math.round((expiresAt - Date.now()) / 1000));
-      const mins = Math.floor(remaining / 60), secs = remaining % 60;
-      const pct = (remaining / DURATION) * 100;
-      const timerEl = document.getElementById('timer');
-      timerEl.textContent = String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
-      timerEl.className = 'timer-display' + (pct < 20 ? ' danger' : pct < 40 ? ' warning' : '');
+      const mins = Math.floor(remaining/60), secs = remaining%60;
+      const pct  = (remaining/DURATION)*100;
+      const el   = document.getElementById('timer');
+      el.textContent = String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+      el.className   = 'timer-display' + (pct<20?' danger':pct<40?' warning':'');
       const fill = document.getElementById('progress-fill');
-      fill.style.width = pct + '%';
-      fill.style.background = pct < 20 ? 'var(--red)' : pct < 40 ? 'var(--amber)' : 'var(--accent)';
-      if (remaining <= 0) {
+      fill.style.width      = pct + '%';
+      fill.style.background = pct<20?'var(--red)':pct<40?'var(--amber)':'var(--accent)';
+      if (remaining<=0) {
         clearInterval(timerInterval); clearInterval(pollInterval);
         document.getElementById('status-pill').className = 'status-pill expired';
         document.getElementById('status-text').textContent = 'QR code expired — check-in closed';
@@ -301,145 +460,121 @@
       const data = await sbFetch('attendance?session_token=eq.' + encodeURIComponent(sessionToken) + '&order=submitted_at.asc&select=student_name,student_ref,submitted_at');
       currentData = data;
       renderTable(data);
-    } catch(e) {
-      console.error('Fetch error:', e);
-    }
+    } catch(e) { console.error(e); }
   }
 
   function renderTable(data) {
     const total = data.length;
     document.getElementById('stat-total').textContent = total;
-
     if (total > lastCount && total > 0) {
-      const last = data[data.length - 1];
+      const last = data[data.length-1];
       document.getElementById('stat-last').textContent = last.student_name.split(' ')[0];
-      const t = new Date(last.submitted_at);
-      document.getElementById('stat-time').textContent = t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      document.getElementById('response-badge').innerHTML = '<span class="new-badge">+' + (total - lastCount) + ' new</span>';
-      setTimeout(() => { document.getElementById('response-badge').innerHTML = ''; }, 3000);
+      document.getElementById('stat-time').textContent = fmt(last.submitted_at);
+      document.getElementById('response-badge').innerHTML = '<span class="new-badge">+' + (total-lastCount) + ' new</span>';
+      setTimeout(() => { document.getElementById('response-badge').innerHTML=''; }, 3000);
       lastCount = total;
     }
-
     const tbody = document.getElementById('responses-body');
-    if (!total) {
-      tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">⏳</div><div>Waiting for students to scan...</div></div></td></tr>';
-      return;
+    if (!total) { tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state">Waiting for students to scan...</div></td></tr>'; return; }
+    tbody.innerHTML = data.map((r,i) => `<tr><td class="td-num">${i+1}</td><td class="td-name">${esc(r.student_name)}</td><td class="td-ref">${esc(r.student_ref)}</td><td class="td-time">${fmt(r.submitted_at)}</td></tr>`).join('');
+  }
+
+  function endSession() {
+    clearInterval(timerInterval); clearInterval(pollInterval);
+    showView('dashboard');
+  }
+
+  // ── SESSION DETAIL ────────────────────────────────────
+  async function openDetail(token, course, date, lecturer) {
+    document.getElementById('detail-course').textContent = course;
+    document.getElementById('detail-meta').textContent   = [lecturer, date].filter(Boolean).join('  ·  ');
+    detailSession = { course, date, lecturer };
+    detailData = [];
+    document.getElementById('detail-body').innerHTML = '<tr><td colspan="4"><div class="empty-state">Loading...</div></td></tr>';
+    showView('session-detail');
+    try {
+      const data = await sbFetch('attendance?session_token=eq.' + encodeURIComponent(token) + '&order=submitted_at.asc&select=student_name,student_ref,submitted_at');
+      detailData = data;
+      document.getElementById('detail-body').innerHTML = data.length
+        ? data.map((r,i) => `<tr><td class="td-num">${i+1}</td><td class="td-name">${esc(r.student_name)}</td><td class="td-ref">${esc(r.student_ref)}</td><td class="td-time">${fmt(r.submitted_at)}</td></tr>`).join('')
+        : '<tr><td colspan="4"><div class="empty-state">No students checked in for this session.</div></td></tr>';
+    } catch(e) {
+      document.getElementById('detail-body').innerHTML = '<tr><td colspan="4"><div class="empty-state">Failed to load.</div></td></tr>';
     }
-    tbody.innerHTML = data.map((r, i) => {
-      const t = new Date(r.submitted_at);
-      const time = t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      return `<tr>
-        <td class="td-num">${i+1}</td>
-        <td class="td-name">${esc(r.student_name)}</td>
-        <td class="td-ref">${esc(r.student_ref)}</td>
-        <td class="td-time">${time}</td>
-      </tr>`;
-    }).join('');
   }
 
-  function exportCSV() {
-    const s = currentSession;
-    let csv = '';
-    csv += 'ATTENDANCE LIST\n';
-    csv += 'Class: ' + (s.course || '') + '\n';
-    if (s.date)     csv += 'Date: ' + s.date + '\n';
+  // ── EXPORTS ───────────────────────────────────────────
+  function buildCSV(data, s) {
+    let csv = 'ATTENDANCE LIST\n';
+    csv += 'Class: ' + (s.course||'') + '\n';
+    if (s.date)     csv += 'Date: '     + s.date     + '\n';
     if (s.lecturer) csv += 'Lecturer: ' + s.lecturer + '\n';
-    csv += 'Total students: ' + currentData.length + '\n';
-    csv += '\n';
+    csv += 'Total students: ' + data.length + '\n\n';
     csv += 'No.,Full Name,Reference Number,Time\n';
-    currentData.forEach((r, i) => {
-      const t = new Date(r.submitted_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      csv += `${i+1},"${r.student_name}","${r.student_ref}","${t}"\n`;
-    });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-    a.download = (s.course || 'attendance').replace(/\s+/g,'_') + '_' + (s.date||'') + '.csv';
-    a.click();
+    data.forEach((r,i) => { csv += `${i+1},"${r.student_name}","${r.student_ref}","${fmt(r.submitted_at)}"\n`; });
+    return csv;
   }
 
-  function exportPDF() {
+  function buildPDF(data, s) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    const s = currentSession;
-
-    // Header bar
-    doc.setFillColor(14, 15, 17);
-    doc.rect(0, 0, 210, 36, 'F');
-
-    // Title
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(11);
-    doc.setTextColor(200, 245, 100);
+    doc.setFillColor(14,15,17); doc.rect(0,0,210,36,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(200,245,100);
     doc.text('ATTENDANCE LIST', 14, 13);
-
-    // Class name — big and prominent
-    doc.setFontSize(18);
-    doc.setTextColor(255, 255, 255);
-    doc.text(s.course || 'Attendance Record', 14, 28);
-
-    // Meta info row
-    doc.setFillColor(245, 245, 245);
-    doc.rect(0, 36, 210, 18, 'F');
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(80, 80, 80);
-    let metaX = 14;
-    if (s.date) { doc.text('Date: ' + s.date, metaX, 47); metaX += 60; }
-    if (s.lecturer) { doc.text('Lecturer: ' + s.lecturer, metaX, 47); metaX += 70; }
-    doc.text('Total students: ' + currentData.length, metaX, 47);
-
-    // Table header
-    let y = 68;
-    doc.setFillColor(220, 220, 220);
-    doc.rect(14, y - 5, 182, 8, 'F');
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(9);
-    doc.setTextColor(0);
-    doc.text('#', 16, y);
-    doc.text('Full Name', 26, y);
-    doc.text('Reference No.', 120, y);
-    doc.text('Time', 172, y);
-    doc.setFont('helvetica','normal');
-    y += 8;
-
-    // Rows
-    currentData.forEach((r, i) => {
-      if (y > 275) { doc.addPage(); y = 20; }
-      if (i % 2 === 0) { doc.setFillColor(250, 250, 250); doc.rect(14, y-4, 182, 7, 'F'); }
-      const t = new Date(r.submitted_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      doc.setFontSize(10);
-      doc.setTextColor(0);
-      doc.text(String(i+1), 16, y);
-      doc.text(r.student_name.substring(0, 42), 26, y);
-      doc.text(r.student_ref, 120, y);
-      doc.text(t, 172, y);
-      y += 8;
+    doc.setFontSize(18); doc.setTextColor(255,255,255);
+    doc.text(s.course||'Attendance Record', 14, 28);
+    doc.setFillColor(245,245,245); doc.rect(0,36,210,18,'F');
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(80,80,80);
+    let mx=14;
+    if (s.date)     { doc.text('Date: '+s.date, mx, 47); mx+=60; }
+    if (s.lecturer) { doc.text('Lecturer: '+s.lecturer, mx, 47); mx+=70; }
+    doc.text('Total students: '+data.length, mx, 47);
+    let y=68;
+    doc.setFillColor(220,220,220); doc.rect(14,y-5,182,8,'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(0);
+    doc.text('#',16,y); doc.text('Full Name',26,y); doc.text('Reference No.',120,y); doc.text('Time',172,y);
+    doc.setFont('helvetica','normal'); y+=8;
+    data.forEach((r,i) => {
+      if (y>275) { doc.addPage(); y=20; }
+      if (i%2===0) { doc.setFillColor(250,250,250); doc.rect(14,y-4,182,7,'F'); }
+      doc.setFontSize(10); doc.setTextColor(0);
+      doc.text(String(i+1),16,y); doc.text(r.student_name.substring(0,42),26,y);
+      doc.text(r.student_ref,120,y); doc.text(fmt(r.submitted_at),172,y);
+      y+=8;
     });
-
-    // Footer
-    doc.setFontSize(8);
-    doc.setTextColor(160, 160, 160);
+    doc.setFontSize(8); doc.setTextColor(160,160,160);
     doc.text('Generated by AttendQR', 14, 290);
-
-    doc.save((s.course || 'attendance').replace(/\s+/g,'_') + '_' + (s.date||'') + '.pdf');
+    return doc;
   }
 
-  function newSession() {
-    clearInterval(timerInterval); clearInterval(pollInterval);
-    sessionToken = null; expiresAt = null; lastCount = 0; currentData = [];
-    document.getElementById('session-section').classList.add('hidden');
-    document.getElementById('setup-section').classList.remove('hidden');
-    document.getElementById('btn-pdf').classList.add('hidden');
-    document.getElementById('btn-csv').classList.add('hidden');
-    document.getElementById('timer').textContent = '15:00';
-    document.getElementById('timer').className = 'timer-display';
-    document.getElementById('status-pill').className = 'status-pill active';
-    document.getElementById('status-text').textContent = 'QR active — scan to check in';
-    document.getElementById('progress-fill').style.width = '100%';
-    document.getElementById('progress-fill').style.background = 'var(--accent)';
+  function exportPDF()       { const doc=buildPDF(currentData, currentSession); doc.save(fname(currentSession)+'.pdf'); }
+  function exportCSV()       { dl(buildCSV(currentData, currentSession), fname(currentSession)+'.csv'); }
+  function exportDetailPDF() { const doc=buildPDF(detailData, detailSession); doc.save(fname(detailSession)+'.pdf'); }
+  function exportDetailCSV() { dl(buildCSV(detailData, detailSession), fname(detailSession)+'.csv'); }
+
+  async function quickPDF(token, course, date, lecturer) {
+    const data = await sbFetch('attendance?session_token=eq.'+encodeURIComponent(token)+'&order=submitted_at.asc&select=student_name,student_ref,submitted_at');
+    const s = { course, date, lecturer };
+    buildPDF(data, s).save(fname(s)+'.pdf');
+  }
+  async function quickCSV(token, course, date, lecturer) {
+    const data = await sbFetch('attendance?session_token=eq.'+encodeURIComponent(token)+'&order=submitted_at.asc&select=student_name,student_ref,submitted_at');
+    const s = { course, date, lecturer };
+    dl(buildCSV(data, s), fname(s)+'.csv');
   }
 
-  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function dl(csv, name) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    a.download = name; a.click();
+  }
+
+  function fname(s) { return ((s.course||'attendance').replace(/\s+/g,'_') + '_' + (s.date||'')); }
+  function fmt(ts)  { return new Date(ts).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }); }
+  function esc(s)   { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // Init
+  loadDashboard();
 </script>
 </body>
 </html>

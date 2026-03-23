@@ -1,127 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AttendQR — Check In</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,300;9..144,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0e0f11; --surface: #16181c; --surface2: #1e2126;
-      --border: #2a2d35; --text: #f0ede6; --muted: #7a7f8e;
-      --accent: #c8f564; --accent-dim: #a8d44a;
-      --red: #ff6b6b; --red-bg: rgba(255,107,107,0.08);
-      --green: #5dcc8a; --green-bg: rgba(93,204,138,0.08);
-      --font-display: 'Fraunces', Georgia, serif;
-      --font-body: 'DM Sans', sans-serif;
-      --font-mono: 'DM Mono', monospace;
-      --radius: 10px; --radius-lg: 16px;
+    :root{
+      --bg:#0e0f11;--surface:#16181c;--surface2:#1e2126;
+      --border:#2a2d35;--text:#f0ede6;--muted:#7a7f8e;
+      --accent:#c8f564;--accent-dim:#a8d44a;
+      --red:#ff6b6b;--red-bg:rgba(255,107,107,0.08);
+      --green:#5dcc8a;--green-bg:rgba(93,204,138,0.08);
+      --font-display:'Fraunces',Georgia,serif;
+      --font-body:'DM Sans',sans-serif;
+      --font-mono:'DM Mono',monospace;
+      --radius:10px;--radius-lg:16px;
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 15px; line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
-    .container { width: 100%; max-width: 420px; }
-    .brand { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--accent); text-align: center; margin-bottom: 32px; letter-spacing: -0.5px; }
-    .brand span { color: var(--muted); font-weight: 300; }
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 32px; animation: rise 0.4s ease both; }
-    @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-    .course-name { font-family: var(--font-display); font-size: 26px; font-weight: 600; margin-bottom: 4px; }
-    .course-meta { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin-bottom: 28px; }
-    .timer-strip { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-    .timer-strip-label { font-size: 12px; color: var(--muted); }
-    .timer-strip-val { font-family: var(--font-mono); font-size: 16px; font-weight: 500; color: var(--accent); transition: color 0.5s; }
-    .timer-strip-val.warning { color: #ffb347; }
-    .timer-strip-val.danger { color: var(--red); }
-    .field { margin-bottom: 18px; }
-    .field label { display: block; font-size: 12px; color: var(--muted); font-family: var(--font-mono); margin-bottom: 6px; }
-    .field input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: var(--font-body); font-size: 15px; padding: 12px 16px; outline: none; transition: border-color 0.2s; }
-    .field input:focus { border-color: var(--accent); }
-    .field input::placeholder { color: var(--muted); }
-    .error-msg { background: var(--red-bg); border: 1px solid rgba(255,107,107,0.25); border-radius: var(--radius); color: var(--red); font-size: 13px; padding: 10px 14px; margin-bottom: 16px; display: none; }
-    .btn-submit { width: 100%; padding: 14px; background: var(--accent); color: #0e0f11; border: none; border-radius: var(--radius); font-family: var(--font-body); font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.18s; }
-    .btn-submit:hover:not(:disabled) { background: var(--accent-dim); transform: translateY(-1px); }
-    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-    .success-screen { text-align: center; padding: 12px 0; display: none; animation: rise 0.4s ease both; }
-    .success-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--green-bg); border: 1px solid rgba(93,204,138,0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; color: var(--green); }
-    .success-title { font-family: var(--font-display); font-size: 26px; font-weight: 600; margin-bottom: 8px; }
-    .success-sub { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
-    .success-pill { display: inline-block; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 20px; font-family: var(--font-mono); font-size: 13px; color: var(--accent); }
-    .closed-card { text-align: center; }
-    .closed-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--red-bg); border: 1px solid rgba(255,107,107,0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; color: var(--red); }
-    .closed-title { font-family: var(--font-display); font-size: 24px; font-weight: 600; margin-bottom: 8px; }
-    .closed-sub { color: var(--muted); font-size: 14px; }
-    .used-icon { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,179,71,0.08); border: 1px solid rgba(255,179,71,0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; color: #ffb347; }
-    .footer-note { text-align: center; margin-top: 24px; font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
-    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #0e0f11; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.6;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+    .container{width:100%;max-width:420px;}
+    .brand{font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--accent);text-align:center;margin-bottom:32px;letter-spacing:-0.5px;}
+    .brand span{color:var(--muted);font-weight:300;}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;animation:rise 0.4s ease both;}
+    @keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+    .course-name{font-family:var(--font-display);font-size:26px;font-weight:600;margin-bottom:4px;}
+    .course-meta{font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-bottom:28px;}
+    .timer-strip{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+    .timer-strip-label{font-size:12px;color:var(--muted);}
+    .timer-strip-val{font-family:var(--font-mono);font-size:16px;font-weight:500;color:var(--accent);transition:color 0.5s;}
+    .timer-strip-val.warning{color:#ffb347;}
+    .timer-strip-val.danger{color:var(--red);}
+    .field{margin-bottom:18px;}
+    .field label{display:block;font-size:12px;color:var(--muted);font-family:var(--font-mono);margin-bottom:6px;}
+    .field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--font-body);font-size:15px;padding:12px 16px;outline:none;transition:border-color 0.2s;}
+    .field input:focus{border-color:var(--accent);}
+    .field input::placeholder{color:var(--muted);}
+    .error-msg{background:var(--red-bg);border:1px solid rgba(255,107,107,0.25);border-radius:var(--radius);color:var(--red);font-size:13px;padding:10px 14px;margin-bottom:16px;display:none;}
+    .btn-submit{width:100%;padding:14px;background:var(--accent);color:#0e0f11;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:15px;font-weight:500;cursor:pointer;transition:all 0.18s;}
+    .btn-submit:hover:not(:disabled){background:var(--accent-dim);transform:translateY(-1px);}
+    .btn-submit:disabled{opacity:0.5;cursor:not-allowed;}
+    .success-screen{text-align:center;padding:12px 0;display:none;animation:rise 0.4s ease both;}
+    .success-icon{width:64px;height:64px;border-radius:50%;background:var(--green-bg);border:1px solid rgba(93,204,138,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;color:var(--green);}
+    .success-title{font-family:var(--font-display);font-size:26px;font-weight:600;margin-bottom:8px;}
+    .success-sub{color:var(--muted);font-size:14px;margin-bottom:20px;}
+    .success-pill{display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 20px;font-family:var(--font-mono);font-size:13px;color:var(--accent);}
+    .closed-card{text-align:center;}
+    .closed-icon{width:64px;height:64px;border-radius:50%;background:var(--red-bg);border:1px solid rgba(255,107,107,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;color:var(--red);}
+    .used-icon{width:64px;height:64px;border-radius:50%;background:rgba(255,179,71,0.08);border:1px solid rgba(255,179,71,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;color:#ffb347;}
+    .closed-title{font-family:var(--font-display);font-size:24px;font-weight:600;margin-bottom:8px;}
+    .closed-sub{color:var(--muted);font-size:14px;}
+    .footer-note{text-align:center;margin-top:24px;font-size:11px;color:var(--muted);font-family:var(--font-mono);}
+    .spinner{display:inline-block;width:16px;height:16px;border:2px solid #0e0f11;border-top-color:transparent;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
   </style>
 </head>
 <body>
-
 <div class="container">
   <div class="brand">Attend<span>QR</span></div>
 
-  <!-- NO SESSION -->
   <div class="card" id="screen-none" style="display:none;">
-    <div class="closed-card">
-      <div class="closed-icon">?</div>
-      <div class="closed-title">No session found</div>
-      <div class="closed-sub">Please scan the QR code your lecturer projected on screen.</div>
-    </div>
+    <div class="closed-card"><div class="closed-icon">?</div><div class="closed-title">No session found</div><div class="closed-sub">Please scan the QR code your lecturer projected on screen.</div></div>
   </div>
 
-  <!-- ALREADY USED ON THIS DEVICE -->
   <div class="card" id="screen-used" style="display:none;">
-    <div class="closed-card">
-      <div class="used-icon">!</div>
-      <div class="closed-title">Already submitted</div>
-      <div class="closed-sub">You have already marked your attendance for this session. Each student can only check in once.</div>
-    </div>
+    <div class="closed-card"><div class="used-icon">!</div><div class="closed-title">Already submitted</div><div class="closed-sub">You have already marked your attendance for this session. Each student can only check in once.</div></div>
   </div>
 
-  <!-- EXPIRED -->
   <div class="card" id="screen-expired" style="display:none;">
-    <div class="closed-card">
-      <div class="closed-icon">✕</div>
-      <div class="closed-title">QR code expired</div>
-      <div class="closed-sub">This check-in session has closed. Contact your lecturer.</div>
-    </div>
+    <div class="closed-card"><div class="closed-icon">✕</div><div class="closed-title">QR code expired</div><div class="closed-sub">This check-in session has closed. Contact your lecturer.</div></div>
   </div>
 
-  <!-- FORM -->
   <div class="card" id="screen-form" style="display:none;">
     <div class="course-name" id="ci-course"></div>
     <div class="course-meta" id="ci-meta"></div>
-
     <div class="timer-strip">
       <span class="timer-strip-label">Session closes in</span>
       <span class="timer-strip-val" id="ci-timer">—</span>
     </div>
-
     <div id="form-body">
-      <div class="field">
-        <label>Full name</label>
-        <input type="text" id="ci-name" placeholder="Enter your full name" autocomplete="name" />
-      </div>
-      <div class="field">
-        <label>Reference / student number</label>
-        <input type="text" id="ci-ref" placeholder="e.g. 20240042" autocomplete="off" />
-      </div>
+      <div class="field"><label>Full name</label><input type="text" id="ci-name" placeholder="Enter your full name" autocomplete="name"/></div>
+      <div class="field"><label>Reference / student number</label><input type="text" id="ci-ref" placeholder="e.g. 20240042" autocomplete="off"/></div>
       <div class="error-msg" id="ci-error"></div>
       <button class="btn-submit" id="submit-btn" onclick="submitAttendance()">Mark attendance</button>
     </div>
-
-    <!-- SUCCESS -->
     <div class="success-screen" id="success-screen">
       <div class="success-icon">✓</div>
       <div class="success-title">You're marked in!</div>
       <div class="success-sub">Your attendance has been recorded.</div>
       <div class="success-pill" id="success-info"></div>
     </div>
-
-    <!-- EXPIRED mid-fill -->
-    <div id="screen-expired-mid" style="display:none; text-align:center; padding: 12px 0;">
-      <div class="closed-icon" style="margin: 0 auto 20px;">✕</div>
+    <div id="screen-expired-mid" style="display:none;text-align:center;padding:12px 0;">
+      <div class="closed-icon" style="margin:0 auto 20px;">✕</div>
       <div class="closed-title">Session closed</div>
       <div class="closed-sub">The 15-minute window ended. Contact your lecturer.</div>
     </div>
@@ -136,43 +107,16 @@
 
   const params   = new URLSearchParams(window.location.search);
   const token    = params.get('token');
-  const course   = params.get('course') || '';
-  const date     = params.get('date') || '';
-  const lecturer = params.get('lecturer') || '';
-  const exp      = parseInt(params.get('exp') || '0');
-
+  const course   = params.get('course')||'';
+  const date     = params.get('date')||'';
+  const lecturer = params.get('lecturer')||'';
+  const exp      = parseInt(params.get('exp')||'0');
   const USED_KEY = 'att_used_' + token;
   let timerInterval = null;
 
-  async function sbInsert(row) {
-    const res = await fetch(SUPABASE_URL + '/rest/v1/attendance', {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_KEY,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify(row)
-    });
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err);
-    }
-  }
-
-  async function checkDuplicate(ref) {
-    const res = await fetch(
-      SUPABASE_URL + '/rest/v1/attendance?session_token=eq.' + encodeURIComponent(token) + '&student_ref=eq.' + encodeURIComponent(ref) + '&select=id&limit=1',
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
-    );
-    const data = await res.json();
-    return data.length > 0;
-  }
-
   function showOnly(id) {
     ['screen-none','screen-used','screen-expired','screen-form'].forEach(s => {
-      document.getElementById(s).style.display = (s === id) ? 'block' : 'none';
+      document.getElementById(s).style.display = s===id ? 'block' : 'none';
     });
   }
 
@@ -180,7 +124,6 @@
     if (!token)                         { showOnly('screen-none');    return; }
     if (localStorage.getItem(USED_KEY)) { showOnly('screen-used');    return; }
     if (Date.now() >= exp)              { showOnly('screen-expired'); return; }
-
     document.getElementById('ci-course').textContent = course;
     document.getElementById('ci-meta').textContent   = [lecturer, date].filter(Boolean).join('  ·  ');
     showOnly('screen-form');
@@ -190,14 +133,14 @@
   function startCountdown() {
     timerInterval = setInterval(() => {
       const remaining = Math.max(0, Math.round((exp - Date.now()) / 1000));
-      const mins = Math.floor(remaining / 60), secs = remaining % 60;
-      const pct  = remaining / (15 * 60);
+      const mins = Math.floor(remaining/60), secs = remaining%60;
+      const pct  = remaining / (15*60);
       const el   = document.getElementById('ci-timer');
       el.textContent = String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
-      el.className   = 'timer-strip-val' + (pct < 0.2 ? ' danger' : pct < 0.4 ? ' warning' : '');
-      if (remaining <= 0) {
+      el.className   = 'timer-strip-val' + (pct<0.2?' danger':pct<0.4?' warning':'');
+      if (remaining<=0) {
         clearInterval(timerInterval);
-        const submitted = document.getElementById('success-screen').style.display !== 'none';
+        const submitted = document.getElementById('success-screen').style.display!=='none';
         if (!submitted) {
           document.getElementById('form-body').style.display        = 'none';
           document.getElementById('screen-expired-mid').style.display = 'block';
@@ -207,19 +150,13 @@
   }
 
   async function submitAttendance() {
-    if (Date.now() >= exp) {
-      document.getElementById('form-body').style.display        = 'none';
-      document.getElementById('screen-expired-mid').style.display = 'block';
-      return;
-    }
+    if (Date.now()>=exp) { document.getElementById('form-body').style.display='none'; document.getElementById('screen-expired-mid').style.display='block'; return; }
     if (localStorage.getItem(USED_KEY)) { showOnly('screen-used'); return; }
 
     const name = document.getElementById('ci-name').value.trim();
     const ref  = document.getElementById('ci-ref').value.trim();
-
     if (!name) { showError('Please enter your full name.');               return; }
     if (!ref)  { showError('Please enter your reference/student number.'); return; }
-
     hideError();
 
     const btn = document.getElementById('submit-btn');
@@ -227,31 +164,25 @@
     btn.innerHTML = '<span class="spinner"></span> Submitting...';
 
     try {
-      const isDuplicate = await checkDuplicate(ref);
-      if (isDuplicate) {
-        showError('Student number ' + ref + ' has already been checked in.');
-        btn.disabled = false;
-        btn.textContent = 'Mark attendance';
-        return;
-      }
+      // Check duplicate
+      const chk = await fetch(SUPABASE_URL+'/rest/v1/attendance?session_token=eq.'+encodeURIComponent(token)+'&student_ref=eq.'+encodeURIComponent(ref)+'&select=id&limit=1',
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer '+SUPABASE_KEY } });
+      const dup = await chk.json();
+      if (dup.length>0) { showError('Student number '+ref+' has already been checked in.'); btn.disabled=false; btn.textContent='Mark attendance'; return; }
 
-      await sbInsert({
-        session_token: token,
-        course,
-        date,
-        lecturer,
-        student_name: name,
-        student_ref: ref
+      // Insert
+      const res = await fetch(SUPABASE_URL+'/rest/v1/attendance', {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer '+SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ session_token: token, course, date, lecturer, student_name: name, student_ref: ref })
       });
+      if (!res.ok) throw new Error(await res.text());
 
-      // Lock this device
       localStorage.setItem(USED_KEY, '1');
-
       clearInterval(timerInterval);
-      document.getElementById('form-body').style.display     = 'none';
+      document.getElementById('form-body').style.display      = 'none';
       document.getElementById('success-screen').style.display = 'block';
-      document.getElementById('success-info').textContent    = name + '  ·  ' + ref;
-
+      document.getElementById('success-info').textContent     = name + '  ·  ' + ref;
     } catch(e) {
       showError('Something went wrong. Please try again.');
       btn.disabled = false;
@@ -259,11 +190,8 @@
     }
   }
 
-  function showError(msg) {
-    const el = document.getElementById('ci-error');
-    el.textContent = msg; el.style.display = 'block';
-  }
-  function hideError() { document.getElementById('ci-error').style.display = 'none'; }
+  function showError(msg) { const el=document.getElementById('ci-error'); el.textContent=msg; el.style.display='block'; }
+  function hideError()    { document.getElementById('ci-error').style.display='none'; }
 
   init();
 </script>
