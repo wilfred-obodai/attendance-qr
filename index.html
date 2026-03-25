@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AttendQR — Login</title>
+  <title>MyAttendance — Login</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,300;9..144,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
@@ -46,7 +46,7 @@
 </head>
 <body>
 <div class="container">
-  <div class="brand">Attend<span>QR</span></div>
+  <div class="brand">My<span>Attendance</span></div>
   <div class="brand-sub">Lecturer portal</div>
 
   <div class="card">
@@ -97,7 +97,7 @@
 
   // Redirect if already logged in
   const stored = localStorage.getItem('aq_session');
-  if (stored) { try { const s = JSON.parse(stored); if (s.access_token) window.location.href = 'dashboard.html'; } catch(e){} }
+  if (stored) { try { const s = JSON.parse(stored); if (s.access_token) window.location.href = 'index.html'; } catch(e){} }
 
   function switchTab(tab) {
     document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='signup')));
