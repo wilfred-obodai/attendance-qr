@@ -58,33 +58,16 @@
     <div id="error-msg" class="error-msg"></div>
     <div id="success-msg" class="success-msg"></div>
 
-    <!-- LOGIN -->
     <div id="tab-login">
-      <div class="field">
-        <label>Email</label>
-        <input type="email" id="login-email" placeholder="rayibor@example.com" />
-      </div>
-      <div class="field">
-        <label>Password</label>
-        <input type="password" id="login-password" placeholder="Your password" />
-      </div>
+      <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="rayibor@example.com"/></div>
+      <div class="field"><label>Password</label><input type="password" id="login-password" placeholder="Your password"/></div>
       <button class="btn" id="login-btn" onclick="login()">Sign in</button>
     </div>
 
-    <!-- SIGNUP -->
     <div id="tab-signup" style="display:none;">
-      <div class="field">
-        <label>Full name</label>
-        <input type="text" id="signup-name" placeholder="e.g. Dr. Raphael Ayibor" />
-      </div>
-      <div class="field">
-        <label>Email</label>
-        <input type="email" id="signup-email" placeholder="rayibor@example.com" />
-      </div>
-      <div class="field">
-        <label>Password</label>
-        <input type="password" id="signup-password" placeholder="Min. 6 characters" />
-      </div>
+      <div class="field"><label>Full name</label><input type="text" id="signup-name" placeholder="e.g. Dr. Raphael Ayibor"/></div>
+      <div class="field"><label>Email</label><input type="email" id="signup-email" placeholder="rayibor@example.com"/></div>
+      <div class="field"><label>Password</label><input type="password" id="signup-password" placeholder="Min. 6 characters"/></div>
       <button class="btn" id="signup-btn" onclick="signup()">Create account</button>
     </div>
   </div>
@@ -95,22 +78,24 @@
   const SUPABASE_URL = 'https://omdkxclfaicigehnqkjn.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tZGt4Y2xmYWljaWdlaG5xa2puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5MzA1OTgsImV4cCI6MjA4OTUwNjU5OH0._yUrFJ-LRQYz7mJesYX1LyZ1bJWM4D3cY2frnlnx-jg';
 
-  // Redirect if already logged in
-  const stored = localStorage.getItem('aq_session');
-  if (stored) { try { const s = JSON.parse(stored); if (s.access_token) window.location.href = 'index.html'; } catch(e){} }
+  // If already logged in, go straight to dashboard
+  try {
+    const s = JSON.parse(localStorage.getItem('aq_session') || 'null');
+    if (s && s.access_token) window.location.replace('dashboard.html');
+  } catch(e) {}
 
   function switchTab(tab) {
-    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='signup')));
-    document.getElementById('tab-login').style.display  = tab==='login'  ? 'block' : 'none';
-    document.getElementById('tab-signup').style.display = tab==='signup' ? 'block' : 'none';
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='signup')));
+    document.getElementById('tab-login').style.display  = tab==='login'  ? 'block':'none';
+    document.getElementById('tab-signup').style.display = tab==='signup' ? 'block':'none';
     hideMessages();
   }
 
   async function authFetch(endpoint, body) {
-    const res = await fetch(SUPABASE_URL + '/auth/v1/' + endpoint, {
-      method: 'POST',
-      headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+    const res = await fetch(SUPABASE_URL+'/auth/v1/'+endpoint, {
+      method:'POST',
+      headers:{'apikey':SUPABASE_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify(body)
     });
     return res.json();
   }
@@ -118,25 +103,25 @@
   async function login() {
     const email    = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
-    if (!email || !password) { showError('Please fill in all fields.'); return; }
+    if (!email||!password) { showError('Please fill in all fields.'); return; }
     setLoading('login-btn', true);
-    const data = await authFetch('token?grant_type=password', { email, password });
+    const data = await authFetch('token?grant_type=password', {email, password});
     setLoading('login-btn', false);
-    if (data.error || data.error_description) { showError(data.error_description || data.error); return; }
-    localStorage.setItem('aq_session', JSON.stringify({ access_token: data.access_token, user: data.user }));
-    window.location.href = 'index.html';
+    if (data.error||data.error_description) { showError(data.error_description||data.error); return; }
+    localStorage.setItem('aq_session', JSON.stringify({access_token:data.access_token, user:data.user}));
+    window.location.replace('dashboard.html');
   }
 
   async function signup() {
     const name     = document.getElementById('signup-name').value.trim();
     const email    = document.getElementById('signup-email').value.trim();
     const password = document.getElementById('signup-password').value;
-    if (!name || !email || !password) { showError('Please fill in all fields.'); return; }
-    if (password.length < 6) { showError('Password must be at least 6 characters.'); return; }
+    if (!name||!email||!password) { showError('Please fill in all fields.'); return; }
+    if (password.length<6) { showError('Password must be at least 6 characters.'); return; }
     setLoading('signup-btn', true);
-    const data = await authFetch('signup', { email, password, data: { full_name: name } });
+    const data = await authFetch('signup', {email, password, data:{full_name:name}});
     setLoading('signup-btn', false);
-    if (data.error || data.error_description) { showError(data.error_description || data.error); return; }
+    if (data.error||data.error_description) { showError(data.error_description||data.error); return; }
     showSuccess('Account created! Check your email to confirm, then sign in.');
     switchTab('login');
   }
@@ -148,10 +133,15 @@
   function setLoading(btnId, loading) {
     const btn = document.getElementById(btnId);
     btn.disabled = loading;
-    btn.innerHTML = loading ? '<span class="spinner"></span> Please wait...' : (btnId==='login-btn' ? 'Sign in' : 'Create account');
+    btn.innerHTML = loading ? '<span class="spinner"></span> Please wait...' : (btnId==='login-btn'?'Sign in':'Create account');
   }
 
-  document.addEventListener('keydown', e => { if (e.key==='Enter') { const active=document.getElementById('tab-login').style.display!=='none'; active ? login() : signup(); } });
+  document.addEventListener('keydown', e => {
+    if (e.key==='Enter') {
+      const loginVisible = document.getElementById('tab-login').style.display !== 'none';
+      loginVisible ? login() : signup();
+    }
+  });
 </script>
 </body>
 </html>
